@@ -2,6 +2,7 @@ import { Box, Flex, Heading, Text } from '@chakra-ui/react';
 import Image from 'next/image';
 
 import heroImage from '@/assets/hero-image.png';
+import { ClaimUsernameForm } from '@/components/claim-username-form';
 
 export default function Home() {
   return (
@@ -25,6 +26,7 @@ export default function Home() {
           Conecte seu calendário e permita que as pessoas marquem agendamentos
           no seu tempo livre.
         </Text>
+        <ClaimUsernameForm />
       </Box>
       <Box
         as={Image}
