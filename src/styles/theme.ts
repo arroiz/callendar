@@ -18,7 +18,7 @@ export const theme = extendTheme({
         fontFamily: roboto.style.fontFamily,
       },
       body: {
-        backgroundColor: 'gray.900',
+        backgroundColor: 'blackAlpha.900',
         color: 'gray.100',
         '-webkit-font-smoothing': 'antialiased',
       },

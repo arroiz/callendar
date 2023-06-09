@@ -35,7 +35,7 @@ export function ClaimUsernameForm() {
         onSubmit={handleSubmit(handleClaimUsername)}
         display="grid"
         borderRadius="md"
-        backgroundColor="gray.800"
+        backgroundColor="blackAlpha.800"
         padding={4}
         gridTemplateColumns={{ base: '1fr', md: '1fr auto' }}
         gap={2}
@@ -47,12 +47,12 @@ export function ClaimUsernameForm() {
           htmlFor="username"
           borderRadius="md"
           alignItems="center"
-          color="gray.500"
+          color="gray.100"
           paddingX={2}
-          background="gray.900"
+          background="blackAlpha.900"
           cursor="text"
           _focusWithin={{
-            outlineWidth: 1,
+            outlineWidth: 2,
             outlineStyle: 'solid',
             outlineColor: 'green.300',
           }}
@@ -78,7 +78,7 @@ export function ClaimUsernameForm() {
           left={5}
           bottom="0"
           fontSize="2xs"
-          color={errors.username?.message ? 'red.500' : 'gray.500'}
+          color={errors.username?.message ? 'red.500' : 'blackAlpha.500'}
         >
           {errors.username?.message || 'Digite o nome do usuário desejado'}
         </Text>
