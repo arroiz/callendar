@@ -20,7 +20,9 @@ import {
   useSteps,
 } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/router';
 import { ArrowRight } from 'phosphor-react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -42,9 +44,11 @@ const registerFormSchema = z.object({
 type RegisterFormData = z.infer<typeof registerFormSchema>;
 
 export default function Register() {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerFormSchema),
@@ -53,6 +57,12 @@ export default function Register() {
     index: 0,
     count: steps.length,
   });
+
+  useEffect(() => {
+    if (router.query.username) {
+      setValue('username', String(router.query.username));
+    }
+  }, [router?.query, setValue]);
 
   function handleRegister(data: RegisterFormData) {
     console.log(data);
@@ -106,7 +116,6 @@ export default function Register() {
           <Flex
             borderRadius="md"
             alignItems="center"
-            color="gray.100"
             paddingX={2}
             background="blackAlpha.900"
             cursor="text"

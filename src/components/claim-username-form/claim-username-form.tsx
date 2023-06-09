@@ -3,6 +3,7 @@ import { ArrowRight } from 'phosphor-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import router from 'next/router';
 
 const claimUsernameFormSchema = z.object({
   username: z
@@ -20,13 +21,13 @@ export function ClaimUsernameForm() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<ClaimUsernameFormData>({
     resolver: zodResolver(claimUsernameFormSchema),
   });
 
   async function handleClaimUsername(data: ClaimUsernameFormData) {
-    console.log(data);
+    await router.push(`/register?username=${data.username}`);
   }
 
   return (
@@ -47,7 +48,6 @@ export function ClaimUsernameForm() {
           htmlFor="username"
           borderRadius="md"
           alignItems="center"
-          color="gray.100"
           paddingX={2}
           background="blackAlpha.900"
           cursor="text"
@@ -75,7 +75,12 @@ export function ClaimUsernameForm() {
             {...register('username')}
           />
         </Flex>
-        <Button type="submit" rightIcon={<ArrowRight />} colorScheme="green">
+        <Button
+          type="submit"
+          rightIcon={<ArrowRight />}
+          colorScheme="green"
+          isLoading={isSubmitting}
+        >
           reservar
         </Button>
         <Text
