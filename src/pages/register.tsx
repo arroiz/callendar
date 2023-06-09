@@ -2,6 +2,7 @@ import {
   Button,
   Flex,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   Heading,
   Input,
@@ -18,15 +19,44 @@ import {
   chakra,
   useSteps,
 } from '@chakra-ui/react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowRight } from 'phosphor-react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 const steps = [1, 2, 3, 4];
 
+const registerFormSchema = z.object({
+  username: z
+    .string()
+    .min(3, { message: 'O usuário precisa ter pelo menos 3 letras.' })
+    .regex(/^([a-z\\-]+)$/i, {
+      message: 'O usuário deve ter apenas letras e hifens',
+    })
+    .transform((username) => username.toLowerCase()),
+  name: z
+    .string()
+    .min(3, { message: 'O nome precisa ter pelo menos 3 letras.' }),
+});
+
+type RegisterFormData = z.infer<typeof registerFormSchema>;
+
 export default function Register() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerFormSchema),
+  });
   const { activeStep } = useSteps({
     index: 0,
     count: steps.length,
   });
+
+  function handleRegister(data: RegisterFormData) {
+    console.log(data);
+  }
 
   return (
     <Flex
@@ -63,6 +93,7 @@ export default function Register() {
         </Stepper>
       </Flex>
       <chakra.form
+        onSubmit={handleSubmit(handleRegister)}
         background="blackAlpha.500"
         padding={6}
         borderRadius="md"
@@ -70,7 +101,7 @@ export default function Register() {
         flexDirection="column"
         gap={4}
       >
-        <FormControl>
+        <FormControl isInvalid={Boolean(errors.username)}>
           <FormLabel htmlFor="username">Nome de usuário</FormLabel>
           <Flex
             borderRadius="md"
@@ -79,10 +110,16 @@ export default function Register() {
             paddingX={2}
             background="blackAlpha.900"
             cursor="text"
+            role="group"
             _focusWithin={{
               outlineWidth: 2,
               outlineStyle: 'solid',
               outlineColor: 'green.300',
+            }}
+            sx={{
+              outlineWidth: Boolean(errors.username) ? 2 : 0,
+              outlineStyle: 'solid',
+              outlineColor: 'red.500',
             }}
           >
             <Text>callendar.com/</Text>
@@ -95,14 +132,35 @@ export default function Register() {
               _focusVisible={{
                 borderColor: 'none',
               }}
+              _invalid={{
+                borderColor: 'none',
+              }}
+              {...register('username')}
             />
           </Flex>
+          {errors.username ? (
+            <FormErrorMessage data-peer>
+              {errors.username.message}
+            </FormErrorMessage>
+          ) : null}
         </FormControl>
-        <FormControl>
+        <FormControl isInvalid={Boolean(errors.name)}>
           <FormLabel>Nome completo</FormLabel>
-          <Input type="text" focusBorderColor="green.300" />
+          <Input
+            type="text"
+            focusBorderColor="green.300"
+            {...register('name')}
+          />
+          {errors.name ? (
+            <FormErrorMessage>{errors.name.message}</FormErrorMessage>
+          ) : null}
         </FormControl>
-        <Button colorScheme="green" rightIcon={<ArrowRight />}>
+        <Button
+          colorScheme="green"
+          rightIcon={<ArrowRight />}
+          isLoading={isSubmitting}
+          type="submit"
+        >
           Próximo passo
         </Button>
       </chakra.form>

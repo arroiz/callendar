@@ -56,6 +56,11 @@ export function ClaimUsernameForm() {
             outlineStyle: 'solid',
             outlineColor: 'green.300',
           }}
+          sx={{
+            outlineWidth: Boolean(errors.username) ? 2 : 0,
+            outlineStyle: 'solid',
+            outlineColor: 'red.500',
+          }}
         >
           <Text>callendar.com/</Text>
           <Input

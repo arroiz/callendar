@@ -20,7 +20,6 @@ export const theme = extendTheme({
       body: {
         backgroundColor: 'blackAlpha.900',
         color: 'gray.100',
-        '-webkit-font-smoothing': 'antialiased',
       },
     },
   },
