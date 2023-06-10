@@ -8,13 +8,11 @@ import {
   Heading,
   Input,
   Step,
-  StepDescription,
   StepIcon,
   StepIndicator,
   StepNumber,
   StepSeparator,
   StepStatus,
-  StepTitle,
   Stepper,
   Text,
   chakra,
@@ -69,6 +67,8 @@ export default function Register() {
   async function handleRegister(data: RegisterFormData) {
     try {
       await api.post('/users', { name: data.name, username: data.username });
+
+      await router.push('/register/connect-calendar');
     } catch (error) {
       if (error instanceof AxiosError) {
         return alert(
@@ -116,7 +116,7 @@ export default function Register() {
       </Flex>
       <chakra.form
         onSubmit={handleSubmit(handleRegister)}
-        background="blackAlpha.500"
+        background="gray.900"
         padding={6}
         borderRadius="md"
         display="flex"
@@ -129,7 +129,7 @@ export default function Register() {
             borderRadius="md"
             alignItems="center"
             paddingX={2}
-            background="blackAlpha.900"
+            background="whiteAlpha.100"
             cursor="text"
             role="group"
             _focusWithin={{
@@ -147,6 +147,7 @@ export default function Register() {
             <Input
               id="username"
               placeholder="seu usuário"
+              background="transparent"
               border="none"
               color="white"
               paddingLeft={1}
@@ -168,6 +169,7 @@ export default function Register() {
         <FormControl isInvalid={Boolean(errors.name)}>
           <FormLabel>Nome completo</FormLabel>
           <Input
+            background="whiteAlpha.100"
             type="text"
             focusBorderColor="green.300"
             {...register('name')}

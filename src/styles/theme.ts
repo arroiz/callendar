@@ -1,4 +1,4 @@
-import { extendTheme } from '@chakra-ui/react';
+import { extendTheme, type ThemeConfig } from '@chakra-ui/react';
 import { Roboto } from '@next/font/google';
 
 const roboto = Roboto({
@@ -8,7 +8,13 @@ const roboto = Roboto({
   fallback: ['sans-serif'],
 });
 
+const config: ThemeConfig = {
+  initialColorMode: 'dark',
+  useSystemColorMode: false,
+};
+
 export const theme = extendTheme({
+  config,
   styles: {
     global: {
       '*': {
@@ -18,7 +24,7 @@ export const theme = extendTheme({
         fontFamily: roboto.style.fontFamily,
       },
       body: {
-        backgroundColor: 'blackAlpha.900',
+        backgroundColor: 'whiteAlpha.100',
         color: 'gray.200',
       },
     },

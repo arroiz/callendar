@@ -19,7 +19,7 @@ export default function Home() {
           Agendamento descomplicado
         </Heading>
         <Text
-          color="blackAlpha.300"
+          color="whiteAlpha.800"
           lineHeight="1.6"
           fontSize={{ base: 'md', md: 'xl' }}
         >
