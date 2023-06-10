@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { setCookie } from 'nookies';
 
 export default async function handler(
   req: NextApiRequest,
@@ -20,6 +21,11 @@ export default async function handler(
   }
 
   const user = await prisma.user.create({ data: { name, username } });
+
+  setCookie({ res }, '@callendar:userId', user.id, {
+    maxAge: 60 * 60 * 24 * 7,
+    path: '/',
+  });
 
   return res.status(201).json(user);
 }
