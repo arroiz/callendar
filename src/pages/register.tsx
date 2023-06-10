@@ -1,3 +1,4 @@
+import { api } from '@/lib/api';
 import {
   Button,
   Flex,
@@ -20,6 +21,7 @@ import {
   useSteps,
 } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { AxiosError } from 'axios';
 import { useRouter } from 'next/router';
 import { ArrowRight } from 'phosphor-react';
 import { useEffect } from 'react';
@@ -64,8 +66,18 @@ export default function Register() {
     }
   }, [router?.query, setValue]);
 
-  function handleRegister(data: RegisterFormData) {
-    console.log(data);
+  async function handleRegister(data: RegisterFormData) {
+    try {
+      await api.post('/users', { name: data.name, username: data.username });
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return alert(
+          error?.response?.data?.message || 'Erro na criação do usuário'
+        );
+      }
+
+      console.log(error);
+    }
   }
 
   return (
