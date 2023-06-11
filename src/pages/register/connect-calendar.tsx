@@ -12,16 +12,26 @@ import {
   Text,
   useSteps,
 } from '@chakra-ui/react';
-import { ArrowRight } from 'phosphor-react';
-import { signIn } from 'next-auth/react';
+import { ArrowRight, Check } from 'phosphor-react';
+import { signIn, useSession } from 'next-auth/react';
+import { useRouter } from 'next/router';
 
 const steps = [1, 2, 3, 4];
 
 export default function ConnectCalendar() {
+  const session = useSession();
+  const router = useRouter();
   const { activeStep } = useSteps({
     index: 1,
     count: steps.length,
   });
+
+  const hasAuthError = Boolean(router.query.error);
+  const hasAuthentication = session.status === 'authenticated';
+
+  async function handleConnectCalendar() {
+    await signIn('google');
+  }
 
   return (
     <Flex
@@ -78,13 +88,24 @@ export default function ConnectCalendar() {
           <Button
             colorScheme="green"
             variant="outline"
-            rightIcon={<ArrowRight />}
-            onClick={() => signIn('google')}
+            rightIcon={hasAuthentication ? <Check /> : <ArrowRight />}
+            onClick={handleConnectCalendar}
+            isDisabled={hasAuthentication}
           >
-            Conectar
+            {hasAuthentication ? 'Conectado' : 'Conectar'}
           </Button>
         </Flex>
-        <Button colorScheme="green" rightIcon={<ArrowRight />}>
+        {hasAuthError ? (
+          <Text color="red.400" size="sm">
+            Falha ao se conectar ao Google, verifique se você habilitou as
+            permissões de acesso ao Google Calendar.
+          </Text>
+        ) : null}
+        <Button
+          colorScheme="green"
+          rightIcon={<ArrowRight />}
+          isDisabled={!hasAuthentication}
+        >
           Próximo passo
         </Button>
       </Flex>
