@@ -15,28 +15,65 @@ import {
   chakra,
   useSteps,
 } from '@chakra-ui/react';
-import { signIn, useSession } from 'next-auth/react';
-import { useRouter } from 'next/router';
 import { ArrowRight } from 'phosphor-react';
+import { useFieldArray, useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 const steps = [1, 2, 3, 4];
 
 const daysOfWeek = [
+  'Domingo',
   'Segunda-feira',
   'Terça-feira',
   'Quarta-feira',
   'Quinta-feira',
   'Sexta-feira',
   'Sabado',
-  'Domingo',
 ];
 
+const timeIntervalFormSchema = z.object({
+  username: z
+    .string()
+    .min(3, { message: 'O usuário precisa ter pelo menos 3 letras.' })
+    .regex(/^([a-z\\-]+)$/i, {
+      message: 'O usuário deve ter apenas letras e hifens',
+    })
+    .transform((username) => username.toLowerCase()),
+  name: z
+    .string()
+    .min(3, { message: 'O nome precisa ter pelo menos 3 letras.' }),
+});
+
 export default function RegisterIntervals() {
-  const session = useSession();
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { isSubmitting, errors },
+  } = useForm({
+    defaultValues: {
+      intervals: [
+        { weekday: 0, enabled: false, startTime: '08:00', endTime: '18:00' },
+        { weekday: 1, enabled: true, startTime: '08:00', endTime: '18:00' },
+        { weekday: 2, enabled: true, startTime: '08:00', endTime: '18:00' },
+        { weekday: 3, enabled: true, startTime: '08:00', endTime: '18:00' },
+        { weekday: 4, enabled: true, startTime: '08:00', endTime: '18:00' },
+        { weekday: 5, enabled: true, startTime: '08:00', endTime: '18:00' },
+        { weekday: 6, enabled: false, startTime: '08:00', endTime: '18:00' },
+      ],
+    },
+  });
   const { activeStep } = useSteps({
     index: 2,
     count: steps.length,
   });
+
+  const { fields } = useFieldArray({
+    name: 'intervals',
+    control,
+  });
+
+  async function handleSetTimeIntervals() {}
 
   return (
     <Flex
@@ -73,6 +110,7 @@ export default function RegisterIntervals() {
         </Stepper>
       </Flex>
       <chakra.form
+        onSubmit={handleSubmit(handleSetTimeIntervals)}
         display="flex"
         flexDirection="column"
         borderRadius="md"
@@ -86,9 +124,9 @@ export default function RegisterIntervals() {
           borderRadius="md"
           flexDirection="column"
         >
-          {daysOfWeek.map((day) => (
+          {fields.map(({ enabled, endTime, id, startTime, weekday }, index) => (
             <Flex
-              key={day}
+              key={id}
               justifyContent="space-between"
               padding={4}
               _notLast={{
@@ -97,10 +135,13 @@ export default function RegisterIntervals() {
               }}
             >
               <Flex alignItems="center" gap={3}>
-                <Checkbox colorScheme="green" />
-                {day}
+                <Checkbox
+                  colorScheme="green"
+                  {...register(`intervals.${index}.enabled`)}
+                />
+                {daysOfWeek[weekday]}
               </Flex>
-              <Flex alignItems="center" gap={2} maxWidth="220px">
+              <Flex alignItems="center" gap={2} maxWidth="230px">
                 <Input
                   background="whiteAlpha.100"
                   colorScheme="green"
@@ -112,6 +153,7 @@ export default function RegisterIntervals() {
                       filter: 'invert(100%)',
                     },
                   }}
+                  {...register(`intervals.${index}.startTime`)}
                 />
                 <Input
                   background="whiteAlpha.100"
@@ -124,6 +166,7 @@ export default function RegisterIntervals() {
                       filter: 'invert(100%)',
                     },
                   }}
+                  {...register(`intervals.${index}.endTime`)}
                 />
               </Flex>
             </Flex>
