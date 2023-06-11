@@ -15,8 +15,9 @@ import {
   chakra,
   useSteps,
 } from '@chakra-ui/react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowRight } from 'phosphor-react';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 const steps = [1, 2, 3, 4];
@@ -32,25 +33,33 @@ const daysOfWeek = [
 ];
 
 const timeIntervalFormSchema = z.object({
-  username: z
-    .string()
-    .min(3, { message: 'O usuário precisa ter pelo menos 3 letras.' })
-    .regex(/^([a-z\\-]+)$/i, {
-      message: 'O usuário deve ter apenas letras e hifens',
-    })
-    .transform((username) => username.toLowerCase()),
-  name: z
-    .string()
-    .min(3, { message: 'O nome precisa ter pelo menos 3 letras.' }),
+  intervals: z
+    .array(
+      z.object({
+        weekday: z.number(),
+        enabled: z.boolean(),
+        startTime: z.string(),
+        endTime: z.string(),
+      })
+    )
+    .length(7)
+    .transform((intervals) => intervals.filter((interval) => interval.enabled))
+    .refine((intervals) => intervals.length > 0, {
+      message: 'É necessário selecionar pelo menos um dia da semana',
+    }),
 });
+
+type TimeIntervalsFormData = z.infer<typeof timeIntervalFormSchema>;
 
 export default function RegisterIntervals() {
   const {
     register,
     handleSubmit,
     control,
+    watch,
     formState: { isSubmitting, errors },
   } = useForm({
+    resolver: zodResolver(timeIntervalFormSchema),
     defaultValues: {
       intervals: [
         { weekday: 0, enabled: false, startTime: '08:00', endTime: '18:00' },
@@ -73,7 +82,9 @@ export default function RegisterIntervals() {
     control,
   });
 
-  async function handleSetTimeIntervals() {}
+  const intervals = watch('intervals');
+
+  async function handleSetTimeIntervals(data: TimeIntervalsFormData) {}
 
   return (
     <Flex
@@ -124,7 +135,7 @@ export default function RegisterIntervals() {
           borderRadius="md"
           flexDirection="column"
         >
-          {fields.map(({ enabled, endTime, id, startTime, weekday }, index) => (
+          {fields.map(({ id, weekday }, index) => (
             <Flex
               key={id}
               justifyContent="space-between"
@@ -135,11 +146,24 @@ export default function RegisterIntervals() {
               }}
             >
               <Flex alignItems="center" gap={3}>
-                <Checkbox
-                  colorScheme="green"
-                  {...register(`intervals.${index}.enabled`)}
+                <Controller
+                  name={`intervals.${index}.enabled`}
+                  control={control}
+                  render={({ field }) => (
+                    <Checkbox
+                      colorScheme="green"
+                      id={`intervals.${index}.enabled`}
+                      defaultChecked={field.value}
+                      checked={field.value}
+                      onChange={(event) => {
+                        field.onChange(event.target.checked);
+                      }}
+                    />
+                  )}
                 />
-                {daysOfWeek[weekday]}
+                <Text as="label" htmlFor={`intervals.${index}.enabled`}>
+                  {daysOfWeek[weekday]}
+                </Text>
               </Flex>
               <Flex alignItems="center" gap={2} maxWidth="230px">
                 <Input
@@ -148,6 +172,7 @@ export default function RegisterIntervals() {
                   type="time"
                   step={60}
                   focusBorderColor="green.300"
+                  disabled={!intervals[index].enabled}
                   sx={{
                     '&::-webkit-calendar-picker-indicator': {
                       filter: 'invert(100%)',
@@ -161,6 +186,7 @@ export default function RegisterIntervals() {
                   type="time"
                   step={60}
                   focusBorderColor="green.300"
+                  disabled={!intervals[index].enabled}
                   sx={{
                     '&::-webkit-calendar-picker-indicator': {
                       filter: 'invert(100%)',
@@ -172,7 +198,17 @@ export default function RegisterIntervals() {
             </Flex>
           ))}
         </Flex>
-        <Button colorScheme="green" rightIcon={<ArrowRight />}>
+        {errors?.intervals?.message ? (
+          <Text color="red.400" fontSize="sm">
+            {errors?.intervals?.message}
+          </Text>
+        ) : null}
+        <Button
+          colorScheme="green"
+          rightIcon={<ArrowRight />}
+          isLoading={isSubmitting}
+          type="submit"
+        >
           Próximo passo
         </Button>
       </chakra.form>
