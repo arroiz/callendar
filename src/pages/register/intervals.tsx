@@ -1,3 +1,4 @@
+import { api } from '@/lib/api';
 import { convertTimeInMinutes } from '@/utils/convert-time-in-minuts';
 import {
   Button,
@@ -104,7 +105,9 @@ export default function RegisterIntervals() {
 
   const intervals = watch('intervals');
 
-  async function handleSetTimeIntervals(data: TimeIntervalsFormDataOutput) {}
+  async function handleSetTimeIntervals(data: TimeIntervalsFormDataOutput) {
+    await api.post('/users/time-intervals', data);
+  }
 
   return (
     <Flex

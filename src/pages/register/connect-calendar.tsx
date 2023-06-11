@@ -33,6 +33,10 @@ export default function ConnectCalendar() {
     await signIn('google');
   }
 
+  async function goToNextStep() {
+    await router.push('/register/intervals');
+  }
+
   return (
     <Flex
       maxWidth="572px"
@@ -105,6 +109,7 @@ export default function ConnectCalendar() {
           colorScheme="green"
           rightIcon={<ArrowRight />}
           isDisabled={!hasAuthentication}
+          onClick={goToNextStep}
         >
           Próximo passo
         </Button>
