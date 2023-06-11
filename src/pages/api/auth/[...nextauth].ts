@@ -41,6 +41,12 @@ export function buildAuthOptions(
 
         return true;
       },
+      async session({ session, user }) {
+        return {
+          ...session,
+          user,
+        };
+      },
     },
   };
 }
