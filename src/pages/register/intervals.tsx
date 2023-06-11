@@ -1,3 +1,4 @@
+import { convertTimeInMinutes } from '@/utils/convert-time-in-minuts';
 import {
   Button,
   Checkbox,
@@ -46,10 +47,29 @@ const timeIntervalFormSchema = z.object({
     .transform((intervals) => intervals.filter((interval) => interval.enabled))
     .refine((intervals) => intervals.length > 0, {
       message: 'É necessário selecionar pelo menos um dia da semana',
-    }),
+    })
+    .transform((intervals) =>
+      intervals.map((interval) => ({
+        weekday: interval.weekday,
+        startTimeInMinutes: convertTimeInMinutes(interval.startTime),
+        endTimeInMinutes: convertTimeInMinutes(interval.endTime),
+      }))
+    )
+    .refine(
+      (intervals) =>
+        intervals.every(
+          (interval) =>
+            interval.endTimeInMinutes - interval.startTimeInMinutes >= 60
+        ),
+      {
+        message:
+          'O intervalo entre o início e fim deve ser maior que 60 minutos',
+      }
+    ),
 });
 
-type TimeIntervalsFormData = z.infer<typeof timeIntervalFormSchema>;
+type TimeIntervalsFormDataInput = z.input<typeof timeIntervalFormSchema>;
+type TimeIntervalsFormDataOutput = z.output<typeof timeIntervalFormSchema>;
 
 export default function RegisterIntervals() {
   const {
@@ -58,7 +78,7 @@ export default function RegisterIntervals() {
     control,
     watch,
     formState: { isSubmitting, errors },
-  } = useForm({
+  } = useForm<TimeIntervalsFormDataInput, any, TimeIntervalsFormDataOutput>({
     resolver: zodResolver(timeIntervalFormSchema),
     defaultValues: {
       intervals: [
@@ -84,7 +104,7 @@ export default function RegisterIntervals() {
 
   const intervals = watch('intervals');
 
-  async function handleSetTimeIntervals(data: TimeIntervalsFormData) {}
+  async function handleSetTimeIntervals(data: TimeIntervalsFormDataOutput) {}
 
   return (
     <Flex
