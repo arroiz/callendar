@@ -10,10 +10,10 @@ import {
   StepStatus,
   Stepper,
   Text,
-  useColorMode,
   useSteps,
 } from '@chakra-ui/react';
 import { ArrowRight } from 'phosphor-react';
+import { signIn } from 'next-auth/react';
 
 const steps = [1, 2, 3, 4];
 
@@ -22,7 +22,6 @@ export default function ConnectCalendar() {
     index: 1,
     count: steps.length,
   });
-  const { colorMode, toggleColorMode } = useColorMode();
 
   return (
     <Flex
@@ -80,7 +79,7 @@ export default function ConnectCalendar() {
             colorScheme="green"
             variant="outline"
             rightIcon={<ArrowRight />}
-            onClick={toggleColorMode}
+            onClick={() => signIn('google')}
           >
             Conectar
           </Button>
