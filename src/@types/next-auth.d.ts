@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import NextAuth from 'next-auth';
 
 declare module 'next-auth' {
@@ -7,5 +8,9 @@ declare module 'next-auth' {
     username: string;
     email: string;
     avatar_url: string;
+  }
+
+  interface Session {
+    user: User;
   }
 }
