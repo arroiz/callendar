@@ -66,5 +66,6 @@ model UserTimeInterval {
   user    User   @relation(fields: [user_id], references: [id])
   user_id String
 
+  @@unique([weekday, user_id])
   @@map("user_time_intervals")
 }
