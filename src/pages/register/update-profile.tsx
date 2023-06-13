@@ -24,6 +24,8 @@ import { ArrowRight } from 'phosphor-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { buildAuthOptions } from '../api/auth/[...nextauth]';
+import { useSession } from 'next-auth/react';
+import Image from 'next/image';
 
 const steps = [1, 2, 3, 4];
 
@@ -34,6 +36,7 @@ const updateProfileFormSchema = z.object({
 type UpdateProfileFormData = z.infer<typeof updateProfileFormSchema>;
 
 export default function UpdateProfile() {
+  const session = useSession();
   const {
     register,
     handleSubmit,
@@ -42,12 +45,15 @@ export default function UpdateProfile() {
     resolver: zodResolver(updateProfileFormSchema),
   });
   const { activeStep } = useSteps({
-    index: 0,
+    index: 3,
     count: steps.length,
   });
 
   async function handleUpdateProfile(data: UpdateProfileFormData) {
     try {
+      await api.put('/users/update-profile', {
+        bio: data.bio,
+      });
     } catch (error) {}
   }
 
@@ -94,16 +100,33 @@ export default function UpdateProfile() {
         flexDirection="column"
         gap={4}
       >
-        <Text as="label">Foto de perfil</Text>
+        <Flex flexDirection="column" gap={2}>
+          <Text color="whiteAlpha.800">Foto de perfil</Text>
+          <Flex
+            borderRadius="full"
+            overflow="hidden"
+            width="80px"
+            height="80px"
+          >
+            <Image
+              src={session.data?.user.avatar_url || ''}
+              width={80}
+              height={80}
+              alt=""
+            />
+          </Flex>
+        </Flex>
         <FormControl isInvalid={Boolean(errors.bio)}>
-          <FormLabel>sobre você</FormLabel>
+          <FormLabel color="whiteAlpha.800">sobre você</FormLabel>
           <Textarea
             background="whiteAlpha.100"
             focusBorderColor="green.300"
             {...register('bio')}
           />
         </FormControl>
-        <Text fontSize="sm">Fale um pouco sobre você</Text>
+        <Text fontSize="sm" color="whiteAlpha.800">
+          Fale um pouco sobre você
+        </Text>
         <Button
           colorScheme="green"
           rightIcon={<ArrowRight />}
